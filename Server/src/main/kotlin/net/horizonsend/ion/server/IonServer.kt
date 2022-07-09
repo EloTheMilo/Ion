@@ -1,8 +1,16 @@
 package net.horizonsend.ion.server
 
 import co.aikar.commands.PaperCommandManager
+import kotlin.reflect.full.createInstance
 import net.horizonsend.ion.common.managers.CommonManager
+import net.horizonsend.ion.common.utilities.loadConfiguration
+import net.horizonsend.ion.server.commands.BlasterColor
 import net.horizonsend.ion.server.commands.GuideCommand
+import net.horizonsend.ion.server.commands.IonCommand
+import net.horizonsend.ion.server.commands.ItemCommand
+import net.horizonsend.ion.server.customitems.CustomItem
+import net.horizonsend.ion.server.customitems.DamageableCustomItem
+import net.horizonsend.ion.server.customitems.StackableCustomItem
 import net.horizonsend.ion.server.listeners.luckperms.UserDataRecalculateListener
 import net.horizonsend.ion.server.utilities.forbiddenCraftingItems
 import org.bukkit.Keyed
@@ -20,7 +28,21 @@ import org.reflections.scanners.Scanners.SubTypes
 
 @Suppress("Unused")
 class IonServer : JavaPlugin() {
+	companion object {
+		lateinit var plugin: JavaPlugin private set
+
+		var balancingConfiguration = BalancingConfiguration(); private set
+
+		var damageableCustomItems = mapOf<Int, DamageableCustomItem>(); private set
+		var stackableCustomItems = mapOf<Int, StackableCustomItem>(); private set
+
+		fun reloadConfiguration() { balancingConfiguration = loadConfiguration(plugin.dataFolder.toPath()) }
+	}
+
 	override fun onEnable() {
+		plugin = this
+
+		reloadConfiguration()
 		CommonManager.init(dataFolder.toPath())
 
 		val reflectionsScanner = Reflections("net.horizonsend.ion.server")
@@ -37,6 +59,18 @@ class IonServer : JavaPlugin() {
 			.forEach {
 				server.pluginManager.registerEvents(it as Listener, this)
 			}
+
+		damageableCustomItems = reflectionsScanner
+			.get(Scanners.SubTypes.of(DamageableCustomItem::class.java).asClass<CustomItem>())
+			.filter { !it.kotlin.isAbstract }
+			.mapNotNull { it.kotlin.createInstance() as? DamageableCustomItem }
+			.associateBy { it.customModelData }
+
+		stackableCustomItems = reflectionsScanner
+			.get(Scanners.SubTypes.of(StackableCustomItem::class.java).asClass<CustomItem>())
+			.filter { !it.kotlin.isAbstract }
+			.mapNotNull { it.kotlin.createInstance() as? StackableCustomItem }
+			.associateBy { it.customModelData }
 
 		// Luckperms
 		UserDataRecalculateListener()
@@ -116,7 +150,11 @@ class IonServer : JavaPlugin() {
 		 * Commands
 		 */
 		PaperCommandManager(this).apply {
-			registerCommand(GuideCommand())
+			arrayOf(BlasterColor(), GuideCommand(), IonCommand(), ItemCommand()).forEach {
+				registerCommand(it)
+			}
+
+			commandCompletions.registerStaticCompletion("customItems", damageableCustomItems.values.map { it::class.simpleName })
 		}
 	}
 }
