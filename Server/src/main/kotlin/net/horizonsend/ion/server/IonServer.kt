@@ -26,7 +26,6 @@ class IonServer : JavaPlugin() {
 		val reflectionsScanner = Reflections("net.horizonsend.ion.server")
 
 		reflectionsScanner.get(SubTypes.of(Listener::class.java).asClass<Listener>())
-			// TODO: Listeners should not be handling state so directly, they should not need the plugin instance.
 			.map {
 				val parameters = it.constructors[0].parameterTypes.map { type -> when (type) {
 					IonServer::class.java -> this
