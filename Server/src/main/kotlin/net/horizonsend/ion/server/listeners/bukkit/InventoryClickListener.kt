@@ -35,6 +35,24 @@ class InventoryClickListener : Listener {
 		// Custom items are warped fungus on a stick and potentially stacked, most but not all inventory operations work
 		// fine, but some do not, so we need to specifically handle these ourselves.
 		when (event.action) {
+			InventoryAction.COLLECT_TO_CURSOR -> if (cursorIsCustom) {
+				for (itemID in 0..event.view.countSlots()) {
+					val item = event.view.getItem(itemID) ?: continue
+
+					if (!item.hasItemMeta()) continue
+					if (!item.itemMeta.hasCustomModelData()) continue
+					if (item.type != Material.WARPED_FUNGUS_ON_A_STICK) continue
+					if (item.itemMeta.customModelData != event.cursor!!.itemMeta.customModelData) continue
+
+					val amountToTake = min(64 - event.cursor!!.amount, item.amount)
+
+					if (amountToTake == 0) break
+
+					event.cursor!!.amount += amountToTake
+					item.amount -= amountToTake
+				}
+				update()
+			}
 			InventoryAction.CLONE_STACK -> if (slotIsCustom) {
 				event.view.cursor = event.currentItem?.asQuantity(64)
 				update()
