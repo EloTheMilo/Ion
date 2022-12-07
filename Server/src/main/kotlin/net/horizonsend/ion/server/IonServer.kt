@@ -7,6 +7,7 @@ import net.horizonsend.ion.common.loadConfiguration
 import net.horizonsend.ion.server.commands.IonCustomItemCommands
 import net.horizonsend.ion.server.commands.PatreonCommands
 import net.horizonsend.ion.server.commands.BountyCommands
+import net.horizonsend.ion.server.commands.ConfigurationCommands
 import net.horizonsend.ion.server.legacy.commands.AchievementsCommand
 import net.starlegacy.database.schema.starships.PlayerStarshipData
 import net.starlegacy.legacyDisable
@@ -29,8 +30,8 @@ class IonServer : JavaPlugin() {
 		lateinit var Ion: IonServer private set
 	}
 
-	val configuration = loadConfiguration<ServerConfiguration>(dataFolder, "server.conf")
-	val balancing = loadConfiguration<BalancingConfiguration>(dataFolder, "balancing.conf")
+	var configuration = loadConfiguration<ServerConfiguration>(dataFolder, "server.conf")
+	var balancing = loadConfiguration<BalancingConfiguration>(dataFolder, "balancing.conf")
 
 	override fun onEnable() { try {
 		Connectivity.open(dataFolder)
@@ -44,7 +45,8 @@ class IonServer : JavaPlugin() {
 			AchievementsCommand(),
 			PatreonCommands(),
 			BountyCommands(),
-			IonCustomItemCommands()
+			IonCustomItemCommands(),
+			ConfigurationCommands()
 		)
 			@Suppress("Deprecation")
 			commandManager.enableUnstableAPI("help")
