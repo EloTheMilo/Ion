@@ -2,10 +2,8 @@ package net.horizonsend.ion.server
 
 import net.horizonsend.ion.server.IonServer.Companion.Ion
 import net.horizonsend.ion.server.customitems.CustomItemList
-import net.horizonsend.ion.server.legacy.utilities.enumSetOf
 import net.starlegacy.feature.misc.CustomItems
 import org.bukkit.Bukkit
-import org.bukkit.Keyed
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.FurnaceRecipe
@@ -87,6 +85,14 @@ fun initializeCrafting() {
 		setIngredient('g', GOLD_INGOT)
 		setIngredient('d', GREEN_DYE)
 		setIngredient('r', REDSTONE)
+	}
+
+	// Standard Magazine Crafting
+	itemStackShapeRecipe("standard_magazine", CustomItemList.STANDARD_MAGAZINE.itemStack) {
+		shape("aaa", "qqq", "aaa")
+
+		setIngredient('a', RecipeChoice.ExactChoice(CustomItems.MINERAL_ALUMINUM.singleItem()))
+		setIngredient('q', LAPIS_BLOCK)
 	}
 }
 
