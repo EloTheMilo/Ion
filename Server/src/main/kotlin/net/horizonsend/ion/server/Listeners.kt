@@ -37,6 +37,7 @@ import net.horizonsend.ion.server.legacy.listeners.LevelUpListener
 import net.horizonsend.ion.server.legacy.listeners.MultiblockDetectListener
 import net.horizonsend.ion.server.legacy.listeners.ShipKillListener
 import net.horizonsend.ion.server.legacy.listeners.StationSiegeBeginListener
+import net.horizonsend.ion.server.listeners.CraftingListener
 import net.horizonsend.ion.server.listeners.PlayerItemSwapListener
 
 val listeners = arrayOf(
@@ -68,6 +69,7 @@ val listeners = arrayOf(
 	BuySpawnShuttleListener(),
 	CaptureStationListener(),
 	CompleteCargoRunListener(),
+	CraftingListener(),
 	CreateNationListener(),
 	CreateNationOutpostListener(),
 	CreateSettlementListener(),
